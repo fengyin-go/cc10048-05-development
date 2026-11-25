@@ -63,6 +63,22 @@ class DrillDownService(BaseModuleService):
             "depth": len(layers),
         }
 
+    def execute_batch_drill(
+        self,
+        path_ids: list[int],
+        period: str | None = None,
+        metric: str | None = None,
+        batch_name: str | None = None,
+    ) -> dict[str, Any]:
+        """一次归并多条下钻路径的来源明细，交叠来源按贡献身份只计一次。
+
+        明细与补证、分群对比的完整流程由 drill_batch 领域服务承载，
+        这里保留下钻模块的统一入口，方便沿用「执行下钻」的资源路由调用。
+        """
+        from app.services.drill_batch import batch_drill_service
+
+        return batch_drill_service.create_batch(path_ids, period, metric, batch_name)
+
     def domain_enrich(self, config_id: int) -> dict:
         """对当前模块执行批次操作，联动状态和处理，产出标准化数据产物。
         

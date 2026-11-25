@@ -15,6 +15,12 @@
       </div>
     </header>
 
+    <p v-if="meta.key === 'drill_down'" class="batch-entry">
+      多条父路径会读到同一条子来源时，先归并成
+      <RouterLink to="/batch_drill" data-testid="open-batch-drill">批量下钻数据集</RouterLink>
+      ：交叠来源按贡献身份只计一次，缺失来源先补证再出分群对比。
+    </p>
+
     <div class="stat-row">
       <article v-for="item in stats" :key="item.label" class="stat-card">
         <span class="stat-label">{{ item.label }}</span>
@@ -86,8 +92,7 @@
       </form>
     </div>
 
-    <footer class="page-foot">
-      <span>共 {{ total }} 条{{ meta.name }}记录</span>
+    <footer class="page-foot">      <span>共 {{ total }} 条{{ meta.name }}记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
   </section>
@@ -189,3 +194,19 @@ async function reload() {
 
 onMounted(reload)
 </script>
+
+<style scoped>
+.batch-entry {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  font-size: 13px;
+  color: #1e3a8a;
+}
+.batch-entry a {
+  color: var(--brand);
+  font-weight: 600;
+}
+</style>

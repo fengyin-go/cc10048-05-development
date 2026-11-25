@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.routers import ROUTERS
+from app.routers.batch_drill import router as batch_drill_router
 from app.routers.chains import router as chains_router
 from app.routers.domain import router as domain_router
 from app.store import store
@@ -38,6 +39,9 @@ def overview() -> dict[str, object]:
 
 # 业务链路路由
 app.include_router(chains_router)
+
+# 批量下钻数据集路由（固定前缀，须早于动态 /api/{module}）
+app.include_router(batch_drill_router)
 
 # 领域业务操作路由
 app.include_router(domain_router)

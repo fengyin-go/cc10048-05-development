@@ -110,6 +110,24 @@ def drill_down_execute(path_id: int) -> dict[str, Any]:
     return svc.execute_drill_down(path_id)
 
 
+@router.post("/drill_down/batch-execute")
+def drill_down_batch_execute(payload: dict[str, Any]) -> dict[str, Any]:
+    """批量下钻：多条路径归并成一份来源明细数据集。"""
+    from app.services.drill_down import DrillDownService
+    svc = SERVICES.get("drill_down")
+    if not svc or not isinstance(svc, DrillDownService):
+        raise HTTPException(404, "下钻分析服务不可用")
+    result = svc.execute_batch_drill(
+        payload.get("path_ids") or [],
+        payload.get("period"),
+        payload.get("metric"),
+        payload.get("batch_name"),
+    )
+    if "error" in result:
+        raise HTTPException(400, result["error"])
+    return result
+
+
 @router.get("/data_export/{task_id}/execute")
 def data_export_execute(task_id: int) -> dict[str, Any]:
     """数据导出执行。"""

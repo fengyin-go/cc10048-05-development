@@ -69,6 +69,25 @@ npm run dev
 | 数据采样 | `data_sample` | 采样配置 | 配置标识、数据来源、采样方法 |
 | 报告调度 | `report_schedule` | 报告任务 | 任务标识、报告内容、接收人 |
 
+## 批量下钻数据集
+
+`下钻分析`页顶部入口进入 `/batch_drill`。一次批量下钻可同时选中多条父路径，
+后端 `app/services/drill_batch.py` 把各路径的来源明细归并成一份数据集：
+
+- **交叠去重**：同一子来源被多条父路径读取时，按贡献身份（子来源 + 指标）只计一次，
+  `实际累加值` 是去重后的金额，`交叠金额` 单独露出重复部分，`各路径原始累加` 保留对比；
+- **读取范围可复查**：每个父分组保留自己的实际读取区间，逐条来源可看到状态与备注；
+- **缺失不当零**：迟到来源记为缺失并生成可续做的补证记录，领取回执按
+  “同一来源 + 同一统计区间”幂等，重复领取只保留一份回执；
+- **补证不重复累加**：同一回执重复提交相同数据不会二次入账，批次金额保持不变；
+- **分群对比先核对覆盖**：覆盖未齐时不出统计，补齐后按同一统计期实算并落库
+  `segment_compare` 方案，重复发起复用同一方案。
+
+接口：`POST /api/batch-drill/batches`、`GET /api/batch-drill/batches/{id}`、
+`POST /api/batch-drill/batches/{id}/evidence/claim`、
+`POST /api/batch-drill/receipts/{id}/submit`、
+`POST /api/batch-drill/batches/{id}/compare`。
+
 ## 约定
 
 - 全部模块共享`frontend/src/views/WorkbenchView.vue|tsx`和一套资源路由。
